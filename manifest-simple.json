@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Браузерный асситент",
+  "version": "1.0.0",
+  "description": "Браузерный асситент, адаптированный для поиска на веб-сайте 'Корпус русского рассказа 1900-1930гг.'",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Брузерный асситент"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background-simple.js"
+  }
+}

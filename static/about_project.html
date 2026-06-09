@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О проекте — Корпус русского рассказа 1900–1930 гг.</title>
+    <meta name="description" content="Корпус русского рассказа 1900–1930 — исследование языка и стиля художественной прозы методами компьютерной лингвистики.">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            background: #f0f2f5;
+            color: #1a1a1a;
+        }
+
+        .skip-link {
+            position: fixed;
+            top: -40px;
+            left: 12px;
+            background: #003087;
+            color: #fff;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 0 0 8px 8px;
+            border: 2px solid #ffbf00;
+            z-index: 1000;
+            transition: top 0.1s ease-in;
+            white-space: nowrap;
+        }
+        .skip-link:focus {
+            top: 0;
+            outline: 3px solid #ffbf00;
+            outline-offset: 2px;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #001529;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 2px solid #003060;
+        }
+
+        .logo-area {
+            padding: 24px 20px;
+            border-bottom: 1px solid #0a2a44;
+        }
+
+        .logo-link {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            line-height: 1.4;
+        }
+        .logo-link:hover {
+            text-decoration: underline;
+        }
+        .logo-link:focus-visible {
+            outline: 3px solid #ffbf00;
+            outline-offset: 3px;
+            border-radius: 3px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+            gap: 2px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 20px;
+            color: rgba(255, 255, 255, 0.88);
+            text-decoration: none;
+            font-size: 1rem;
+            min-height: 48px;
+            border-left: 4px solid transparent;
+            transition: background-color 0.15s, color 0.15s;
+            border-radius: 0 4px 4px 0;
+        }
+        .nav-link:hover {
+            background-color: #002244;
+            color: #fff;
+        }
+        .nav-link:focus-visible {
+            outline: 3px solid #ffbf00;
+            outline-offset: -3px;
+            background-color: #002a50;
+        }
+        .nav-link[aria-current="page"] {
+            background-color: #001133;
+            color: #fff;
+            font-weight: 700;
+            border-left-color: #ffbf00;
+        }
+
+        .ext-icon {
+            flex-shrink: 0;
+            opacity: 0.65;
+            width: 14px;
+            height: 14px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            background: #fff;
+            padding: 40px 48px;
+            overflow-x: auto;
+        }
+
+        #main-content {
+            outline: none;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            padding-left: 20px;
+            border-left: 5px solid #0057b8;
+            line-height: 1.3;
+            color: #001a3a;
+        }
+
+        h2 {
+            font-size: 1.45rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: #002b5c;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e6e9ef;
+            line-height: 1.3;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            max-width: 72ch;
+        }
+
+        .main-content a {
+            color: #0057b8;
+            text-decoration: underline;
+            border-radius: 3px;
+        }
+        .main-content a:hover {
+            color: #003d82;
+            text-decoration: underline double;
+        }
+        .main-content a:focus-visible {
+            outline: 3px solid #0057b8;
+            outline-offset: 2px;
+            background-color: #eef4ff;
+        }
+
+        .participants-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0.5rem 0 1rem;
+        }
+        .participants-list li {
+            margin-bottom: 0.4rem;
+        }
+
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid #003060;
+            }
+            .main-content { padding: 24px 20px; }
+            h1 { font-size: 1.6rem; }
+            h2 { font-size: 1.25rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Перейти к содержимому</a>
+
+    <div class="app-container">
+
+        <nav aria-label="Основная навигация" class="sidebar">
+            <div class="logo-area">
+                <span class="logo-link">Корпус русского рассказа 1900–1930 гг.</span>
+            </div>
+            <div class="nav-menu">
+                <a href="https://russian-short-stories.ru/about"
+                   class="nav-link"
+                   aria-current="page">О проекте</a>
+
+                <a href="https://russian-short-stories.ru/story"
+                   class="nav-link">Найти рассказ</a>
+
+                <a href="https://russian-short-stories.ru/writer"
+                   class="nav-link">Найти писателя</a>
+
+                <a href="https://sketchengine.russian-short-stories.ru/"
+                   class="nav-link"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    No Sketch Engine
+                    <svg class="ext-icon" aria-hidden="true" focusable="false"
+                         viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    <span class="sr-only">(откроется в новой вкладке)</span>
+                </a>
+
+                <a href="https://russian-short-stories.ru/syntax"
+                   class="nav-link">Синтаксис</a>
+
+                <a href="https://russian-short-stories.ru/publications"
+                   class="nav-link">Публикации и материалы</a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <article>
+                <h1 id="main-content" tabindex="-1">О проекте</h1>
+
+                <p>Первые три десятилетия XX в. отмечены для России чередой острых социальных потрясений — Русско-японская война (1904–1905), Первая русская революция (1905–1907), Первая мировая война (1914–1918), Февральская и Октябрьская революции 1917 г., Гражданская война (1917–1922) и, наконец, образование Советского государства. Эти социальные катаклизмы кардинально перестроили привычный образ жизни и сложившиеся социальные отношения, привели к трансформации всех стереотипов поведения и общей системы ценностей. Самым драматичным изменениям подвергся русский язык. Кардинально деформировался стиль художественной литературы. Несмотря на то, что все эти качественные революционные преобразования самым очевидным образом бросаются в глаза, науке о языке до сих пор крайне мало известно о том, в чём именно они выражались и как измерить их объём. Для оценки масштабности произошедших в языке трансформаций реализован проект, поддержанный <a href="https://www.rfbr.ru/rffi/ru/">Российским фондом фундаментальных исследований</a> (проект № 17-29-09173 офи_м).</p>
+
+                <p>Для изучения изменений, произошедших в языке и стиле художественных произведений, в проекте используются статистические методы анализа, применяемые к результатам компьютерной и экспертной обработки текстов художественной литературы.</p>
+
+                <p>Для решения этой задачи был сформирован Корпус русского рассказа 1900–1930, который разделён на три хронологически последовательных периода:</p>
+
+                <p>Период I. Рассказ начала XX века (1900–1913),</p>
+                <p>Период II. Рассказ эпохи острых социальных потрясений (1914–1922) — Первая мировая война, Февральская и Октябрьская революции и последующая за ними Гражданская война,</p>
+                <p>Период III. Рассказ постреволюционной эпохи, раннесоветский период (1923–1930).</p>
+
+                <p>При отборе текстов для корпуса придерживались принципа максимальной представленности авторов-прозаиков того времени. На первых этапах исследования был составлен представительный список русских литераторов, публиковавшихся в 1900–1930 гг. Список формировался на основе данных литературных энциклопедий, словарей писателей, каталогов библиотек и публицистических изданий того времени. Общее количество писателей-прозаиков, работавших и печатавшихся в те годы, превысило 2800 персоналий.</p>
+
+                <p>В электронных библиотеках и открытых интернет-источниках был осуществлён поиск рассказов в цифровой форме. В результате собрана коллекция более 5000 текстов, которая легла в основу литературного корпуса. Для лучшей представленности «забытых» писателей тексты их рассказов были оцифрованы — тем самым в проекте решается задача сохранения национального литературного наследия.</p>
+
+                <p>Для автоматического лингвистического анализа отобрано 310 рассказов, представляющих творчество 300 русских писателей — от всемирно известных (А. П. Чехов, Л. Н. Толстой, И. А. Бунин, М. А. Булгаков, М. А. Шолохов) до малоизвестных или фактически забытых авторов. Отобранные рассказы составили аннотированный Корпус-300 объёмом около 1 млн словоупотреблений.</p>
+
+                <p>Работа над Корпусом-300 включала лемматизацию, автоматическую морфологическую и синтаксическую разметку, построение частотных словарей, а также ручную коррекцию и экспертную разметку ряда признаков (тематика, повествование, ритмическая структура). Публикация материалов на сайте <strong>russian-short-stories.ru</strong> даёт возможность онлайн-поиска по текстам, построения частотных списков и доступа к другим материалам проекта.</p>
+
+                <section>
+                    <h2>Краткий обзор основных результатов</h2>
+
+                    <p>Полученные статистические данные об особенностях языка и стиля исследуемой эпохи (частотные списки словоформ и лемм, данные о дистрибуции частей речи, особенности синтаксиса и др.) дали возможность получить статистическое описание лингвостилевых переменных в диахронии, а также описание изменений, произошедших в русском языке в результате событий Первой мировой войны, революций и Гражданской войны 1917–1922 гг.</p>
+
+                    <p>Наиболее сильные отличия в динамике наблюдаются в использовании лексики. Изменился не только словарный состав, но и относительные частоты многих категорий слов. Статистически значимыми словами довоенного периода стали личные местоимения и союз «и», слова, связанные с чувствами героев («красивый», «странный», «чувство»), с неопределённостью («казаться», «что-то») и признаки растущего социального недовольства («надзиратель», «казнь», «мрак»). В военные годы преобладает военная лексика, в революционный период — военная и политическая, в советский — советская реалистическая лексика.</p>
+
+                    <p>Система языка показывает наибольшую стабильность на ритмическом уровне и в дистрибуции частей речи: для всех трёх эпох самая частотная часть речи — существительное, затем глагол, предлог, союз, местоимения. Вместе с тем относительные частоты менялись: доля существительных увеличилась на 4,24% — главным образом за счёт уменьшения доли прилагательных, наречий и союзов.</p>
+
+                    <p>Наиболее значимые грамматические изменения — в употреблении временных форм глагола: доля прошедшего времени выросла с 61% до 82%, настоящего — упала с трети до одной пятой, будущего — сократилась вдвое. Повествование советского периода «сместилось в прошлое».</p>
+
+                    <p>В революционный и постреволюционный периоды упрощаются синтаксические структуры: средняя длина предложения сократилась с 11 до 9 слов. В довоенной прозе изобиловали многоточия, в революционную эпоху наступило время восклицательных знаков.</p>
+
+                    <p>Подробнее о результатах исследований — в публикациях на вкладке «Публикации».</p>
+                </section>
+
+                <section>
+                    <h2>Участники проекта</h2>
+
+                    <p>Проект реализован сотрудниками <a href="http://mathling.phil.spbu.ru/">кафедры математической лингвистики СПбГУ</a> и <a href="https://spb.hse.ru/humart/complit/">департамента филологии НИУ ВШЭ в Санкт-Петербурге</a>.</p>
+
+                    <ul class="participants-list">
+                        <li><a href="https://ru.wikipedia.org/wiki/%D0%9C%D0%B0%D1%80%D1%82%D1%8B%D0%BD%D0%B5%D0%BD%D0%BA%D0%BE,_%D0%93%D1%80%D0%B8%D0%B3%D0%BE%D1%80%D0%B8%D0%B9_%D0%AF%D0%BA%D0%BE%D0%B2%D0%BB%D0%B5%D0%B2%D0%B8%D1%87">Мартыненко Григорий Яковлевич</a> — идеолог и первый руководитель проекта (2018–2019)</li>
+                        <li><a href="https://www.hse.ru/org/persons/209332050">Шерстинова Татьяна Юрьевна</a> — руководитель проекта (с 2019 по настоящее время)</li>
+                        <li>Аверин Борис Валентинович (до 2019)</li>
+                        <li><a href="http://mathling.phil.spbu.ru/node/106">Скребцова Татьяна Георгиевна</a></li>
+                        <li><a href="http://mathling.phil.spbu.ru/node/98">Гребенников Александр Олегович</a></li>
+                        <li>Мельник Алексей Геннадьевич</li>
+                        <li>Попова Татьяна Ивановна</li>
+                        <li>Митренина Ольга Владимировна</li>
+                        <li>Чебанов Сергей Викторович</li>
+                        <li>Казарцев Евгений Вячеславович</li>
+                        <li>Делазари Иван Андреевич</li>
+                        <li>Узденова Алена Дмитриевна</li>
+                    </ul>
+
+                    <p>Большой вклад в сбор материалов внесли студенты <a href="https://spb.hse.ru/ba/philology/">образовательной программы «Филология» НИУ ВШЭ в Санкт-Петербурге</a>:</p>
+                    <ul class="participants-list">
+                        <li>Колесникова Яна</li>
+                        <li>Кирина Маргарита</li>
+                        <li>Турыгина Мария</li>
+                        <li>Ушакова Евгения</li>
+                        <li>Гусева Анна</li>
+                        <li>Зарембо Валерия и другие</li>
+                    </ul>
+                </section>
+            </article>
+        </main>
+
+    </div>
+
+</body>
+</html>

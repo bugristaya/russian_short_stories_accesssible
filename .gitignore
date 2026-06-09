@@ -1,0 +1,4 @@
+node_modules/**
+dist/**
+gpt2giga.log
+.env

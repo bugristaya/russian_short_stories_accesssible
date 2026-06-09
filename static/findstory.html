@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Найти рассказ — Корпус русского рассказа 1900–1930 гг.</title>
+    <meta name="description" content="Поиск по корпусу русских рассказов 1900–1930 годов: заглавие, автор, тематика, хронология.">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            background: #f0f2f5;
+            color: #1a1a1a;
+        }
+
+        .skip-link {
+            position: fixed;
+            top: -40px;
+            left: 12px;
+            background: #003087;
+            color: #fff;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 0 0 8px 8px;
+            border: 2px solid #ffbf00;
+            z-index: 1000;
+            transition: top 0.1s ease-in;
+            white-space: nowrap;
+        }
+        .skip-link:focus {
+            top: 0;
+            outline: 3px solid #ffbf00;
+            outline-offset: 2px;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #001529;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 2px solid #003060;
+        }
+
+        .logo-area {
+            padding: 24px 20px;
+            border-bottom: 1px solid #0a2a44;
+        }
+
+        .logo-link {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            line-height: 1.4;
+        }
+        .logo-link:hover {
+            text-decoration: underline;
+        }
+        .logo-link:focus-visible {
+            outline: 3px solid #ffbf00;
+            outline-offset: 3px;
+            border-radius: 3px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+            gap: 2px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 20px;
+            color: rgba(255, 255, 255, 0.88);
+            text-decoration: none;
+            font-size: 1rem;
+            min-height: 48px;
+            border-left: 4px solid transparent;
+            transition: background-color 0.15s, color 0.15s;
+            border-radius: 0 4px 4px 0;
+        }
+        .nav-link:hover {
+            background-color: #002244;
+            color: #fff;
+        }
+        .nav-link:focus-visible {
+            outline: 3px solid #ffbf00;
+            outline-offset: -3px;
+            background-color: #002a50;
+        }
+        .nav-link[aria-current="page"] {
+            background-color: #001133;
+            color: #fff;
+            font-weight: 700;
+            border-left-color: #ffbf00;
+        }
+
+        .ext-icon {
+            flex-shrink: 0;
+            opacity: 0.65;
+            width: 14px;
+            height: 14px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            background: #fff;
+            padding: 40px 48px;
+            overflow-x: auto;
+        }
+
+        #main-content {
+            outline: none;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-left: 20px;
+            border-left: 5px solid #0057b8;
+            line-height: 1.3;
+            color: #001a3a;
+        }
+
+        h2 {
+            font-size: 1.45rem;
+            font-weight: 600;
+            margin: 1.8rem 0 1rem;
+            color: #002b5c;
+            border-bottom: 2px solid #e6e9ef;
+            padding-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .search-form {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid #e2e6ec;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-field {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a2c3e;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #bdc4d0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #fff;
+            transition: border-color 0.15s;
+        }
+        .form-input:focus {
+            outline: 3px solid #0057b8;
+            outline-offset: 2px;
+            border-color: #0057b8;
+        }
+
+        .year-group {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+        }
+        .year-group .form-field {
+            flex: 1;
+        }
+
+        .topics-group {
+            margin-bottom: 24px;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px 16px;
+            border: 1px solid #e2e6ec;
+            border-radius: 8px;
+            padding: 16px;
+            background: #fff;
+            margin-top: 8px;
+        }
+
+        .topic-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .topic-check input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #0057b8;
+        }
+        .topic-check input[type="checkbox"]:focus-visible {
+            outline: 3px solid #0057b8;
+            outline-offset: 2px;
+        }
+        .topic-check span {
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .topics-legend {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1a2c3e;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            background: #e9ecef;
+            color: #1a2c3e;
+        }
+        .btn-primary {
+            background: #0057b8;
+            color: #fff;
+        }
+        .btn-primary:hover,
+        .btn-primary:focus-visible {
+            background: #003d82;
+            outline: 3px solid #ffbf00;
+            outline-offset: 2px;
+        }
+        .btn-secondary:hover,
+        .btn-secondary:focus-visible {
+            background: #dce2ec;
+            outline: 3px solid #0057b8;
+            outline-offset: 2px;
+        }
+
+        .result-section {
+            margin-top: 24px;
+        }
+
+        .result-info {
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .story-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .story-table th,
+        .story-table td {
+            border-bottom: 1px solid #e2e6ec;
+            padding: 14px 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .story-table th {
+            background-color: #f1f4f9;
+            font-weight: 700;
+            color: #001f3f;
+            font-size: 0.9rem;
+        }
+        .story-table tr:nth-child(even) td {
+            background-color: #fafbfd;
+        }
+        .story-table a {
+            color: #0057b8;
+            text-decoration: underline;
+        }
+        .story-table a:focus-visible {
+            outline: 3px solid #0057b8;
+            outline-offset: 2px;
+        }
+
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding: 12px 0;
+        }
+
+        .pagination-total {
+            margin-right: auto;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .pagination-list {
+            display: flex;
+            gap: 8px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .page-btn {
+            background: #f1f4f9;
+            border: 1px solid #ccd3df;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #1a2c3e;
+        }
+        .page-btn:hover {
+            background: #e6edf6;
+        }
+        .page-btn:focus-visible {
+            outline: 3px solid #0057b8;
+            outline-offset: 2px;
+        }
+        .page-btn[aria-current="page"] {
+            background: #0057b8;
+            border-color: #0057b8;
+            color: #fff;
+            font-weight: 700;
+        }
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid #003060;
+            }
+            .main-content { padding: 24px 20px; }
+            h1 { font-size: 1.6rem; }
+            .topics-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Перейти к содержимому</a>
+
+    <div class="app-container">
+
+        <nav aria-label="Основная навигация" class="sidebar">
+            <div class="logo-area">
+                <span class="logo-link">Корпус русского рассказа 1900–1930 гг.</span>
+            </div>
+            <div class="nav-menu">
+                <a href="https://russian-short-stories.ru/about"
+                   class="nav-link">О проекте</a>
+
+                <a href="https://russian-short-stories.ru/story"
+                   class="nav-link"
+                   aria-current="page">Найти рассказ</a>
+
+                <a href="https://russian-short-stories.ru/writer"
+                   class="nav-link">Найти писателя</a>
+
+                <a href="https://sketchengine.russian-short-stories.ru/"
+                   class="nav-link"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    No Sketch Engine
+                    <svg class="ext-icon" aria-hidden="true" focusable="false"
+                         viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    <span class="sr-only">(откроется в новой вкладке)</span>
+                </a>
+
+                <a href="https://russian-short-stories.ru/syntax"
+                   class="nav-link">Синтаксис</a>
+
+                <a href="https://russian-short-stories.ru/publications"
+                   class="nav-link">Публикации и материалы</a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <h1 id="main-content" tabindex="-1">Найти рассказ</h1>
+
+            <form class="search-form" id="searchForm" novalidate>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="title" class="form-label">Заглавие</label>
+                        <input type="text" id="title" name="title" class="form-input"
+                               placeholder="Введите название рассказа" autocomplete="off">
+                    </div>
+                    <div class="form-field">
+                        <label for="authorName" class="form-label">Имя автора</label>
+                        <input type="text" id="authorName" name="author" class="form-input"
+                               placeholder="Фамилия и имя">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field year-group">
+                        <div class="form-field">
+                            <label for="yearFrom" class="form-label">Год от</label>
+                            <input type="number" id="yearFrom" name="yearFrom" class="form-input"
+                                   min="1900" max="1930" value="1900" step="1">
+                        </div>
+                        <div class="form-field">
+                            <label for="yearTo" class="form-label">Год до</label>
+                            <input type="number" id="yearTo" name="yearTo" class="form-input"
+                                   min="1900" max="1930" value="1930" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <fieldset class="topics-group">
+                    <legend class="topics-legend">Темы</legend>
+                    <div class="topics-grid">
+                        <label class="topic-check"><input type="checkbox" name="topics" value="БУДУЩЕЕ"> <span>Будущее</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="БЫТ"> <span>Быт</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ВЗАИМООТНОШЕНИЯ"> <span>Взаимоотношения</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ВОЙНА"> <span>Война</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ГОРОД"> <span>Город</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ДЕНЬГИ"> <span>Деньги</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ДЕТИ"> <span>Дети</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ДОБРОДЕТЕЛЬ"> <span>Добродетель</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ДОСУГ"> <span>Досуг</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ИСКУССТВО"> <span>Искусство</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="КРАСОТА"> <span>Красота</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ЛЮБОВЬ"> <span>Любовь</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="МЕЧТА"> <span>Мечта</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="МОЛОДЕЖЬ"> <span>Молодёжь</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="НАСИЛИЕ"> <span>Насилие</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ПОЛИТ_БОРЬБА"> <span>Полит. борьба</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ПОРОКИ"> <span>Пороки</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ПРИРОДА"> <span>Природа</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ПРОГРЕСС"> <span>Прогресс</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ПСИХ_СОСТОЯНИЕ"> <span>Псих. состояние</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="РЕВОЛЮЦИЯ"> <span>Революция</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="РЕЛИГИЯ"> <span>Религия</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="СВОБОДА"> <span>Свобода</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="СЕМЬЯ"> <span>Семья</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="СМЕРТЬ"> <span>Смерть</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="СОН"> <span>Сон</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="СОЦ_ГРУППЫ"> <span>Соц. группы</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="СОЦ_ПРОЦЕССЫ"> <span>Соц. процессы</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ТРУД"> <span>Труд</span></label>
+                        <label class="topic-check"><input type="checkbox" name="topics" value="ФАНТАСТИКА"> <span>Фантастика</span></label>
+                    </div>
+                </fieldset>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Поиск</button>
+                    <button type="reset" class="btn btn-secondary">Сбросить</button>
+                </div>
+
+                <div aria-live="polite" class="sr-only" id="formFeedback"></div>
+            </form>
+
+            <div class="result-section">
+                <p class="result-info" id="resultStats">Всего найдено: 534</p>
+
+                <table class="story-table" aria-label="Список найденных рассказов">
+                    <thead>
+                        <tr>
+                            <th scope="col">Эпоха</th>
+                            <th scope="col">Год</th>
+                            <th scope="col">Автор</th>
+                            <th scope="col">Заглавие</th>
+                            <th scope="col">Темы</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        <tr>
+                            <td>I</td>
+                            <td>1902</td>
+                            <td>Милицына Елизавета Митрофановна</td>
+                            <td>В лесу</td>
+                            <td>Взаимоотношения, Природа, Псих. состояние</td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>1902</td>
+                            <td>Наживин Иван Фёдорович</td>
+                            <td>Напрасная тревога</td>
+                            <td>Любовь, Пороки</td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>1901</td>
+                            <td>Куприн Александр Иванович</td>
+                            <td>В цирке</td>
+                            <td>Взаимоотношения, Деньги, Смерть</td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>1902</td>
+                            <td>Жаботинский Владимир Евгеньевич</td>
+                            <td>Бичетта</td>
+                            <td>Прогресс, Смерть</td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>1901</td>
+                            <td>Тимковский Николай Иванович</td>
+                            <td>Не к спеху</td>
+                            <td>Взаимоотношения, Деньги, Добродетель, Пороки, Прогресс, Религия</td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>1901</td>
+                            <td>Короленко Владимир Галактионович</td>
+                            <td>Мороз</td>
+                            <td>Добродетель, Природа, Религия, Семья, Смерть, Сон, Фантастика</td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>1901</td>
+                            <td>Бентовин Борис Ильич</td>
+                            <td>Завещание</td>
+                            <td>Взаимоотношения, Деньги, Дети, Семья, Смерть</td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>1901</td>
+                            <td>Балтрушайтис Юргис Казимирович</td>
+                            <td>Капли</td>
+                            <td>Полит. борьба, Псих. состояние, Смерть, Сон</td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>1901</td>
+                            <td>Гарин-Михайловский Николай Георгиевич</td>
+                            <td>Еврейский погром</td>
+                            <td>Добродетель, Смерть, Соц. группы</td>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>1902</td>
+                            <td>Борис Николаевич Бугаев (Белый Андрей)</td>
+                            <td>Рассказ № 2</td>
+                            <td>Любовь, Псих. состояние, Религия, Сон, Фантастика</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <nav aria-label="Пагинация результатов" class="pagination">
+                    <span class="pagination-total">Всего 534</span>
+                    <ul class="pagination-list">
+                        <li>
+                            <button class="page-btn" id="prevPageBtn"
+                                    aria-label="Предыдущая страница" disabled>← Пред.</button>
+                        </li>
+                        <li><button class="page-btn" aria-current="page" data-page="1">1</button></li>
+                        <li><button class="page-btn" data-page="2">2</button></li>
+                        <li><button class="page-btn" data-page="3">3</button></li>
+                        <li><button class="page-btn" data-page="4">4</button></li>
+                        <li><button class="page-btn" data-page="5">5</button></li>
+                        <li><span aria-hidden="true">…</span></li>
+                        <li><button class="page-btn" data-page="54">54</button></li>
+                        <li>
+                            <button class="page-btn" id="nextPageBtn"
+                                    aria-label="Следующая страница">След. →</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        const form = document.getElementById('searchForm');
+        const feedback = document.getElementById('formFeedback');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            feedback.textContent = 'Поиск выполнен.';
+            setTimeout(() => { feedback.textContent = ''; }, 3000);
+        });
+
+        form.addEventListener('reset', () => {
+            feedback.textContent = 'Форма сброшена.';
+            setTimeout(() => { feedback.textContent = ''; }, 3000);
+        });
+    </script>
+
+</body>
+</html>

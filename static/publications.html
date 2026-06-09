@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Публикации и материалы — Корпус русского рассказа 1900–1930 гг.</title>
+    <meta name="description" content="Публикации, материалы, частотные словари и результаты исследований корпуса русского рассказа 1900–1930 гг.">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            background: #f0f2f5;
+            color: #1a1a1a;
+        }
+
+        .skip-link {
+            position: fixed;
+            top: -40px;
+            left: 12px;
+            background: #003087;
+            color: #fff;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 0 0 8px 8px;
+            border: 2px solid #ffbf00;
+            z-index: 1000;
+            transition: top 0.1s ease-in;
+            white-space: nowrap;
+        }
+        .skip-link:focus {
+            top: 0;
+            outline: 3px solid #ffbf00;
+            outline-offset: 2px;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #001529;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 2px solid #003060;
+        }
+
+        .logo-area {
+            padding: 24px 20px;
+            border-bottom: 1px solid #0a2a44;
+        }
+
+        .logo-link {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            line-height: 1.4;
+        }
+        .logo-link:hover {
+            text-decoration: underline;
+        }
+        .logo-link:focus-visible {
+            outline: 3px solid #ffbf00;
+            outline-offset: 3px;
+            border-radius: 3px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+            gap: 2px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 20px;
+            color: rgba(255, 255, 255, 0.88);
+            text-decoration: none;
+            font-size: 1rem;
+            min-height: 48px;
+            border-left: 4px solid transparent;
+            transition: background-color 0.15s, color 0.15s;
+            border-radius: 0 4px 4px 0;
+        }
+        .nav-link:hover {
+            background-color: #002244;
+            color: #fff;
+        }
+        .nav-link:focus-visible {
+            outline: 3px solid #ffbf00;
+            outline-offset: -3px;
+            background-color: #002a50;
+        }
+        .nav-link[aria-current="page"] {
+            background-color: #001133;
+            color: #fff;
+            font-weight: 700;
+            border-left-color: #ffbf00;
+        }
+
+        .ext-icon {
+            flex-shrink: 0;
+            opacity: 0.65;
+            width: 14px;
+            height: 14px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            background: #fff;
+            padding: 40px 48px;
+            overflow-x: auto;
+        }
+
+        #main-content {
+            outline: none;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            padding-left: 20px;
+            border-left: 5px solid #0057b8;
+            line-height: 1.3;
+            color: #001a3a;
+        }
+
+        h2 {
+            font-size: 1.45rem;
+            font-weight: 600;
+            margin: 2rem 0 0.8rem;
+            color: #002b5c;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e6e9ef;
+            line-height: 1.3;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.4rem 0 0.5rem;
+            color: #003060;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            max-width: 80ch;
+        }
+
+        a {
+            color: #0057b8;
+            text-decoration: underline;
+            border-radius: 3px;
+        }
+        a:hover {
+            color: #003d82;
+            text-decoration: underline double;
+        }
+        a:focus-visible {
+            outline: 3px solid #0057b8;
+            outline-offset: 2px;
+            background-color: #eef4ff;
+        }
+
+        .publications-list {
+            margin: 0.5rem 0 1.5rem;
+            padding-left: 0;
+            list-style: none;
+        }
+        .publications-list li {
+            margin-bottom: 0.75rem;
+            padding-left: 2.2em;
+            position: relative;
+        }
+        .publications-list li .entry-num {
+            position: absolute;
+            left: 0;
+            font-weight: 600;
+            color: #003060;
+        }
+
+        .material-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0.5rem 0 1rem;
+        }
+        .material-list li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.2em;
+            position: relative;
+        }
+        .material-list li::before {
+            content: "•";
+            color: #0057b8;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid #003060;
+            }
+            .main-content { padding: 24px 20px; }
+            h1 { font-size: 1.6rem; }
+            h2 { font-size: 1.25rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Перейти к содержимому</a>
+
+    <div class="app-container">
+
+        <nav aria-label="Основная навигация" class="sidebar">
+            <div class="logo-area">
+                <span class="logo-link">Корпус русского рассказа 1900–1930 гг.</span>
+            </div>
+            <div class="nav-menu">
+                <a href="https://russian-short-stories.ru/about"
+                   class="nav-link">О проекте</a>
+
+                <a href="https://russian-short-stories.ru/story"
+                   class="nav-link">Найти рассказ</a>
+
+                <a href="https://russian-short-stories.ru/writer"
+                   class="nav-link">Найти писателя</a>
+
+                <a href="https://sketchengine.russian-short-stories.ru/"
+                   class="nav-link"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    No Sketch Engine
+                    <svg class="ext-icon" aria-hidden="true" focusable="false"
+                         viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    <span class="sr-only">(откроется в новой вкладке)</span>
+                </a>
+
+                <a href="https://russian-short-stories.ru/syntax"
+                   class="nav-link">Синтаксис</a>
+
+                <a href="https://russian-short-stories.ru/publications"
+                   class="nav-link"
+                   aria-current="page">Публикации и материалы</a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <article>
+                <h1 id="main-content" tabindex="-1">Публикации и материалы</h1>
+
+                <section>
+                    <h2>Концепция корпуса русского рассказа 1900–1930 гг.</h2>
+
+                    <ol class="publications-list">
+                        <li>
+                            <span class="entry-num" aria-hidden="true">1.</span>
+                            Мартыненко Г.&#8239;Я., Шерстинова Т.&#8239;Ю., Мельник А.&#8239;Г., Попова Т.&#8239;И. <a href="https://elibrary.ru/item.asp?id=37295149">Методологические проблемы создания Компьютерной антологии русского рассказа как языкового ресурса для исследования языка и стиля русской художественной прозы в эпоху революционных перемен (первой трети XX&#8239;века)</a> / Компьютерная лингвистика и вычислительные онтологии. Вып. 2. — СПб.: Университет ИТМО, 2018. С. 97–102.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">2.</span>
+                            Мартыненко Г.&#8239;Я., Шерстинова Т.&#8239;Ю., Попова Т.&#8239;И., Мельник А.&#8239;Г., Замирайлова Е.&#8239;В. О принципах создания корпуса русского рассказа первой трети XX&#8239;века // Труды XV Международной конференции по компьютерной и когнитивной лингвистике «TEL 2018». — Казань, 2018. — С. 180–197.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">3.</span>
+                            Sherstinova T., Martynenko G. <a href="http://ceur-ws.org/Vol-2552/">Linguistic and Stylistic Parameters for the Study of Literary Language in the Corpus of Russian Short Stories of the First Third of the 20th Century.</a> CEUR Workshop Proceedings. Vol. 2552. 2020. Pp. 105–120.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">4.</span>
+                            Мартыненко Г.&#8239;Я. Междисциплинарные аспекты корпусометрии // Структурная и прикладная лингвистика. 2019. № 13. С. 5–21.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">5.</span>
+                            Шерстинова Т.&#8239;Ю. Биографическая база данных русских писателей (к созданию корпуса русского рассказа XX&#8239;века) // Труды международной конференции «Корпусная лингвистика-2019». — СПб.: Изд-во С.-Петерб. ун-та, 2019. С. 439–447.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">6.</span>
+                            Skrebtsova T. <a href="http://ceur-ws.org/Vol-2813/rpaper20.pdf">Thematic Tagging of Literary Fiction: The Case of Early 20th Century Russian Short Stories.</a> CEUR Workshop Proceedings. Vol. 2813. 2020. Pp. 265–276. (Scopus)
+                        </li>
+                    </ol>
+
+                    <h3>Дополнительная литература по стилеметрии</h3>
+                    <ol class="publications-list">
+                        <li>
+                            <span class="entry-num" aria-hidden="true">7.</span>
+                            Мартыненко Г.&#8239;Я. Методы математической лингвистики в стилистических исследованиях. — Нестор-История, 2019.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">8.</span>
+                            Мартыненко Г.&#8239;Я. Основы стилеметрии. — Изд-во СПбГУ, 1988.
+                        </li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h2>Результаты исследования</h2>
+
+                    <h3>2018 год</h3>
+                    <ol class="publications-list">
+                        <li>
+                            <span class="entry-num" aria-hidden="true">1.</span>
+                            Martynenko G., Sherstinova T. <a href="https://doi.org/10.1007/978-3-030-02846-6_24">Emotional Waves of a Plot in Literary Texts: New Approaches for Investigation of the Dynamics in Digital Culture.</a> Communications in Computer and Information Science. Vol. 859. Springer, 2018. Pp. 299–309.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">2.</span>
+                            Гребенников А.&#8239;О. Меры лексического сходства частотных словарей. Структурная и прикладная лингвистика. 2018. № 12. С. 41–48.
+                        </li>
+                    </ol>
+
+                    <h3>2019 год</h3>
+                    <ol class="publications-list">
+                        <li>
+                            <span class="entry-num" aria-hidden="true">3.</span>
+                            Мартыненко Г.&#8239;Я. Стилизованные синтаксические триады в русском рассказе первой трети XX&#8239;века // Труды конференции «Корпусная лингвистика-2019». — СПб.: Изд-во С.-Петерб. ун-та, 2019. С. 395–404.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">4.</span>
+                            Martynenko G., Sherstinova T. <a href="https://www.springer.com/gp/book/9783030378578">Analytical Distribution Model for Syntactic Variables Average Values in Russian Literary Texts.</a> Communications in Computer and Information Science. Vol. 1038. Springer, 2019. Pp. 719–731.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">5.</span>
+                            Гребенников А.&#8239;О., Скребцова Т.&#8239;Г. Языковая картина мира в русском рассказе начала XX&#8239;века. Философия и гуманитарные науки в информационном обществе. 2019. № 3(25). С. 82–92.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">6.</span>
+                            Гребенников А.&#8239;О., Ассель А.&#8239;Н. База русского рассказа XIX–XX&#8239;веков. Модели аппроксимации // Труды конференции «Корпусная лингвистика-2019». — СПб.: Изд-во С.-Петерб. ун-та, 2019. С. 379–386.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">7.</span>
+                            Мартыненко Г.&#8239;Я., Шерстинова Т.&#8239;Ю. Симметрика синтаксических фигур в художественной прозе. Компьютерная лингвистика и вычислительные онтологии. Вып. 3. — СПб.: Университет ИТМО, 2019. С. 116–123.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">8.</span>
+                            Шерстинова Т.&#8239;Ю., Гамзатова А.&#8239;Ф. О некоторых возможностях компьютерной лингвистики для междисциплинарных исследований права, языка и литературы. — СПб.: Изд-во СПбГЭУ, 2019. С. 25–37.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">9.</span>
+                            Zamiraylova E., Mitrofanova O. <a href="http://ceur-ws.org/Vol-2552/">Dynamic Topic Modeling of Russian Prose of the First Third of the XXth Century by Means of Non-Negative Matrix Factorization.</a> CEUR Workshop Proceedings. Vol. 2552. 2020. Pp. 321–339.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">10.</span>
+                            Скребцова Т.&#8239;Г. Структура нарратива в русском рассказе начала XX&#8239;века // Труды конференции «Корпусная лингвистика-2019». — СПб.: Изд-во С.-Петерб. ун-та, 2019. С. 426–431.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">11.</span>
+                            Чебанов С.&#8239;В. Описание и повествование в беллетристике и non-fiction. Вестник Тверского государственного университета. Серия: Филология. 2019. С. 98–103.
+                        </li>
+                    </ol>
+
+                    <h3>2020 год</h3>
+                    <ol class="publications-list">
+                        <li>
+                            <span class="entry-num" aria-hidden="true">12.</span>
+                            Sherstinova T., Ushakova E., Melnik A. <a href="https://fruct.org/publications/fruct27/files/She.pdf">Measures of Syntactic Complexity and their Change over Time (the Case of Russian).</a> 27th Conference of Open Innovations Association FRUCT, Italy, 2020. Pp. 221–229.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">13.</span>
+                            Sherstinova T., Grebennikov A., Skrebtsova T. et al. <a href="https://fruct.org/publications/acm27/files/She.pdf">Frequency Word Lists and Their Variability (the Case of Russian Fiction in 1900–1930).</a> 27th Conference FRUCT, Italy, 2020. Pp. 366–373.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">14.</span>
+                            Sherstinova T., Mitrofanova O., Skrebtsova T., Zamiraylova E., Kirina M. Topic Modelling with NMF vs. Expert Topic Annotation: the Case Study of Russian Fiction. LNAI 12469. 2020. Pp. 134–151.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">15.</span>
+                            Kazartsev E., Davydova A., Sherstinova T. Rhythmic Structures of Russian Prose and Occasional Iambs. Speech and Computer. LNAI 12335. 2020. Pp. 194–203.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">16.</span>
+                            Zarembo V., Sherstinova T. <a href="http://ceur-ws.org/Vol-2780/">The Dynamics of Extensive Text Variables in Russian Short Stories.</a> CEUR Workshop Proceedings. Vol. 2780. 2020. Pp. 102–114.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">17.</span>
+                            Лаврентьев А.&#8239;М. и др. <a href="https://doi.org/10.21681/2311-3456-2020-03-31-38">Сравнительный анализ специальных корпусов текстов для задач безопасности</a> // Вопросы кибербезопасности. 2020. № 3(37). С. 58–65.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">18.</span>
+                            Москаленко А.&#8239;Ю. О разработке принципов литературоведческого аннотирования корпуса художественных текстов / TEL-2020. В печати.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">19.</span>
+                            Кирина М.&#8239;А. About the Thematic Component of the Russian Short Stories Database / TEL-2020. В печати.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">20.</span>
+                            Sherstinova T., Skrebtsova T. <a href="http://ceur-ws.org/Vol-2813/rpaper09.pdf">Russian Literature Around the October Revolution: A Quantitative Exploratory Study.</a> CEUR Workshop Proceedings. Vol. 2813. 2020. Pp. 117–128.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">21.</span>
+                            Гребенников А.&#8239;О., Марусенко Н.&#8239;М. Корпус русского рассказа начала XX&#8239;века. Пример лингвостатистического анализа. Компьютерная лингвистика и вычислительные онтологии. Вып. 4. 2020. С. 21–29.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">22.</span>
+                            Скребцова Т.&#8239;Г. <a href="http://fikio.ru/?p=4106">Динамика тем русских рассказов начала XX&#8239;века</a> // Философия и гуманитарные науки в информационном обществе. 2020. № 3. С. 45–60.
+                        </li>
+                    </ol>
+
+                    <h3>2021 год</h3>
+                    <ol class="publications-list">
+                        <li>
+                            <span class="entry-num" aria-hidden="true">23.</span>
+                            Lavrentiev A.&#8239;M., Sherstinova T.&#8239;Yu., Chepovskiy A.&#8239;M., Pincemin B. <a href="http://journals.tsu.ru/engine/download.php?id=212443&area=files">Using TXM Platform for Research on Language Changes over Time.</a> Vestnik TSU. 2021. С. 69–89.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">24.</span>
+                            Скребцова Т.&#8239;Г., Гребенников А.&#8239;О., Шерстинова Т.&#8239;Ю. Динамика лексического состава русской художественной прозы // Компьютерная лингвистика и интеллектуальные технологии. Вып. 20. 2021. С. 646–660.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">25.</span>
+                            Скребцова Т.&#8239;Г. <a href="https://doi.org/10.26170/1999-2629_2021_02_14">Новые реалии общественно-политической жизни 1920-х гг. и их отражение в русской литературе и лексикографии</a> // Политическая лингвистика. 2021. № 2. С. 146–154.
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">26.</span>
+                            Гребенников А.&#8239;О., Скребцова Т.&#8239;Г. Корпус русских рассказов (1900–1930). Устойчивость лингвостатистических характеристик // Материалы конференции «Корпусная лингвистика-2021». — СПб.: Изд-во СПбГУ (в печати).
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">27.</span>
+                            Аванесян Н.&#8239;Л. и др. Корреляционный анализ частотных словарей лингвистических показателей русской прозы 1900–1930&#8239;гг. в динамике // Материалы конференции «Корпусная лингвистика-2021». — СПб.: Изд-во СПбГУ (в печати).
+                        </li>
+                        <li>
+                            <span class="entry-num" aria-hidden="true">28.</span>
+                            Sherstinova T., Kirina M. Data Normalization in the Corpus of Russian Short Stories: Spelling, Literary Themes and Biographical Description of Writers. DTGS 2021 (в печати).
+                        </li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h2>Материалы корпуса</h2>
+
+                    <h3>Список рассказов</h3>
+                    <ul class="material-list">
+                        <li>
+                            <a href="https://drive.google.com/file/d/1qWhAsO5q8YkW4lepIW0SuivjTfPTaGm0/view?usp=sharing">
+                                Список рассказов аннотированного Корпуса (PDF)
+                            </a>
+                        </li>
+                    </ul>
+
+                    <h3>Частотные словари</h3>
+                    <ul class="material-list">
+                        <li>Частотные словари для Корпуса-300, для каждого из его трёх хронологических подкорпусов, а также для каждого рассказа или выборки могут быть получены в реальном времени с помощью корпусного менеджера No Sketch Engine (см. соответствующую вкладку).</li>
+                        <li>
+                            <a href="https://docs.google.com/spreadsheets/d/18bRh_psRLEAVIwR4S-_ss-IJBaUB3LJR/edit?usp=sharing&ouid=116002232792708902152&rtpof=true&sd=true">
+                                Частотные словари. Лемматизация mystem (Таблица Excel)
+                            </a>
+                        </li>
+                    </ul>
+
+                    <h3>Морфология</h3>
+                    <ul class="material-list">
+                        <li>
+                            <a href="https://docs.google.com/spreadsheets/d/1xDAyoTSzDt_6spLbjn0-rj0BtB1vPZ5T/edit?usp=sharing&ouid=101669457739318203702&rtpof=true&sd=true">
+                                Распределение частей речи по писателям Корпуса-300 (Таблица Excel)
+                            </a>
+                        </li>
+                    </ul>
+
+                    <h3>Синтаксис</h3>
+                    <ul class="material-list">
+                        <li>Поиск по синтаксическим параметрам доступен в корпусе на соответствующей вкладке.</li>
+                        <li>
+                            <a href="https://drive.google.com/file/d/1LLGzU636i6IiLxoJzoZTSM6wioXNCfhZ/view?usp=sharing">
+                                Пример синтаксической разметки UDPipe (TXT)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://drive.google.com/file/d/11z0voteY1bN6cOCaLAGgWgrUsQ1PYPLb/view?usp=sharing">
+                                Пример визуализации синтаксических структур (PDF)
+                            </a>
+                        </li>
+                    </ul>
+
+                    <h3>Ритмический анализ</h3>
+                    <ul class="material-list">
+                        <li>
+                            <a href="https://drive.google.com/file/d/15fN51E8nxWBlfu4YDn4AtyOECz1kYdrN/view?usp=sharing">
+                                Фрагмент ритмического словаря русской прозы и эталонные вероятности ритмических структур (PDF)
+                            </a>
+                        </li>
+                    </ul>
+
+                    <h3>Тематическое моделирование</h3>
+                    <ul class="material-list">
+                        <li>
+                            <a href="https://docs.google.com/spreadsheets/d/1jX26g14ly6O3DRANd1Ky44HRut4LfxGE/edit?usp=sharing&ouid=116002232792708902152&rtpof=true&sd=true">
+                                Результаты тематического моделирования, Корпус-300, 1910–1913 (Таблица Excel)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://docs.google.com/spreadsheets/d/1hipmz0bTBSvB1xKaqxrtW5u-klW5Q4gI/edit?usp=sharing&ouid=116002232792708902152&rtpof=true&sd=true">
+                                Результаты тематического моделирования, Корпус-300, 1914–1922 (Таблица Excel)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://docs.google.com/spreadsheets/d/1gT_Lp--4Q3ROsrzpI7N3EDHs2AuFU3wR/edit?usp=sharing&ouid=116002232792708902152&rtpof=true&sd=true">
+                                Результаты тематического моделирования, Корпус-300, 1923–1933 (Таблица Excel)
+                            </a>
+                        </li>
+                    </ul>
+
+                    <h3>Кластеры писателей</h3>
+                    <ul class="material-list">
+                        <li>
+                            <a href="https://drive.google.com/drive/folders/1WqUtvGtk7R0sTluVM-a3Zgz2LlcPQg7q?usp=sharing">
+                                Кластеры писателей, полученные с помощью инструментария Stylo для разных настроек Корпуса-300 (папка на Google Диске)
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+            </article>
+        </main>
+
+    </div>
+
+</body>
+</html>
